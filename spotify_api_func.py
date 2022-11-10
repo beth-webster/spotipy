@@ -1,18 +1,10 @@
 import csv
-import re
+from helper_functions import id_from_url
 
 def write_csv(url, file_name, sp):
 
-
-    try:
-        url_regex = re.search(r"^https?:\/\/(?:open\.)?spotify.com\/(user|episode|playlist|track|album)\/(?:spotify\/playlist\/)?(\w*)", url)
-
-        url_type = url_regex.group(1)
-        id = url_regex.group(2)
-
-    except AttributeError:
-        return 'invalid URL'
-
+    url_type = id_from_url(url)[0]
+    id = id_from_url(url)[1]
 
     if url_type == 'album':
         results_album = sp.album(id, market = 'GB')
