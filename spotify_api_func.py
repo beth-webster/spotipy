@@ -1,5 +1,5 @@
 import csv
-from helper_functions import id_from_url
+from helper_functions import id_from_url, get_artists
 
 def write_csv(url, file_name, sp):
 
@@ -17,12 +17,7 @@ def write_csv(url, file_name, sp):
             label = results_album.get('label')
             bundle_rel_date = results_album.get('release_date')
             bundle_title = results_album.get('name')
-            bundle_artists_list = []
-            for artist in results_album['artists']:
-                for key in artist:
-                    if key == 'name':
-                        bundle_artists_list.append((artist[key]))
-            bundle_artists = '/'.join([str(artist) for artist in bundle_artists_list])
+            bundle_artists = get_artists(results_album) 
             bundle_rows = (bundle_upc, bundle_title, bundle_artists, bundle_rel_date, label)
             writer.writerow(bundle_rows)
 
@@ -33,12 +28,7 @@ def write_csv(url, file_name, sp):
                 track_id = track.get('id')
                 results_album_tracks = sp.track(track_id, market = 'GB')
                 isrc = results_album_tracks['external_ids'].get('isrc')
-                track_artist_list = []
-                for artist in track['artists']:
-                    for key in artist:
-                        if key == 'name':
-                            track_artist_list.append((artist[key]))  
-                track_artist_names = '/'.join([str(artist) for artist in track_artist_list])        
+                track_artist_names = get_artists(track)      
                 track_rows = (isrc, track_title, track_artist_names, track_number)
                 writer.writerow(track_rows)
 
@@ -51,7 +41,6 @@ def write_csv(url, file_name, sp):
             writer = csv.writer(f, dialect='excel')
             writer.writerow(('ISRC','Title', 'Artists', 'Release Date'))
             for track in results['tracks']['items']:
-                artist_list = []
                 if track['track'] is not None:
                     title = track['track'].get('name')
                     if track['track']['external_ids'] is not None:
@@ -63,15 +52,11 @@ def write_csv(url, file_name, sp):
                     else:
                         rel_date = '-'
                     if track['track']['artists'] is not None:
-                        for artist in track['track']['artists']:
-                            for key in artist:
-                                if key == 'name':
-                                    artist_list.append((artist[key]))
+                        artist_names = get_artists(track['track'])
                     else:
-                        artist_list.append(('-'))
+                        artist_names = []
                 else:
                     title = '-'
-                artist_names = '/'.join([str(artist) for artist in artist_list])
                 rows = (isrc, title, artist_names, rel_date)
                 writer.writerow(rows)
 
@@ -82,12 +67,7 @@ def write_csv(url, file_name, sp):
             writer = csv.writer(f, dialect='excel')
             writer.writerow(('ISRC','Title', 'Artists'))
             isrc = results['external_ids'].get('isrc')
-            artists_list = []
-            for artist in results['artists']:
-                for key in artist:
-                    if key == 'name':
-                        artists_list.append((artist[key]))
-            artist_names = '/'.join([str(artist) for artist in artists_list])
+            artist_names = get_artists(results)
             title = results.get('name')
             rows = (isrc, title, artist_names)
             writer.writerow(rows)

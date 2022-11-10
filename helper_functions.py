@@ -8,3 +8,12 @@ def id_from_url(url):
 
     except AttributeError:
         return 'invalid URL'
+
+def get_artists(results):
+    artist_list = []
+    for artist in results['artists']:
+        for key in artist:
+                if key == 'name':
+                    artist_list.append((artist[key]))
+    artists = '/'.join([str(artist) for artist in artist_list])
+    return artists
